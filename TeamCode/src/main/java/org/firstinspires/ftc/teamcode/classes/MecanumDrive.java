@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmodes;
+package org.firstinspires.ftc.teamcode.classes;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -112,7 +112,7 @@ public class MecanumDrive {
         driveRobotRelative(newForward, newRight, rotate);
     }
 
-    private  double squarePower(double num){
+    private double squarePower(double num){
         return num * Math.abs(num);
     }
 
