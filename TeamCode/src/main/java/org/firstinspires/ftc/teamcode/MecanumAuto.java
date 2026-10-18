@@ -14,14 +14,13 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * Autonomous drive program for the robot to find and collect nectar/pollen
 
- *   drive(inches, power)              forward is positive, backward is negative
+ *   drive(inches, power)              forward is positive backward is negative
  *   strafe(inches, power)             right is positive, left is negative
  *   turnTo(degrees)                   field heading; 0 = the way the robot faced at start,
  *                                     positive = counterclockwise (left)
@@ -29,18 +28,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  *                                     ball shows up, stop and run the intake sequence
  *   intakeAndLaunch()                 the intake sequence by itself: flywheel on,
  *                                     intake on, push into the ball, launch, all off
- * The flywheel only spins during the intake and launch part.
- * Hardware this expects:
- *   - REV Color Sensor V3 on the front, pointing at where a ball would be
- *   - continuous-rotation servo turning the rod of compliant wheels (the intake)
- *   - motor spinning the flywheel at the back (the launcher)
+ * The flywheel only spins during the intake and launch part
+ * Hardware this expects
+ *   REV Color Sensor V3 on the front, pointing at where a ball would be
+ *   continuous-rotation servo turning the rod of compliant wheels (the intake)
+ *   motor spinning the flywheel at the back (the launcher)
  */
 @Autonomous(name = "Mecanum Auto", group = "Auto")
 public class MecanumAuto extends LinearOpMode {
 
-    // =================================================================================
-    // SETTINGS: TUNE THESE FOR YOUR ROBOT
-    // =================================================================================
+    // SETTINGS: Tune these for our robo
+
 
     // Encoder counts per one turn of the motor's output shaft.
     // 537.7 = goBILDA 5203 312 RPM. REV HD Hex 20:1 = 560. Check your motor's spec sheet.
@@ -51,7 +49,7 @@ public class MecanumAuto extends LinearOpMode {
     static final double EXTERNAL_GEAR_RATIO = 1.0;
 
     // Wheel diameter in inches. 96 mm = 3.78, 104 mm = 4.09, 75 mm = 2.95.
-    static final double WHEEL_DIAMETER_INCHES = 3.78;
+    static final double WHEEL_DIAMETER_INCHES = 4.09;
 
     // Ticks per wheel revolution divided by inches per revolution (the circumference).
     static final double COUNTS_PER_INCH =
@@ -63,7 +61,7 @@ public class MecanumAuto extends LinearOpMode {
 
     // ---- Turning ----
 
-    // Power per degree of heading error. Higher = snappier turns, more overshoot.
+    // Power per degree of heading error. Higher means faster turns means more overshooting.
     static final double TURN_KP = 0.02;
     static final double TURN_MAX_POWER = 0.5;
     // Below this the motors hum but the robot doesn't move.
@@ -86,8 +84,8 @@ public class MecanumAuto extends LinearOpMode {
 
     // ---- Ball colors (Pollen vs Nectar) ----
 
-    // PLACEHOLDERS: pure textbook colors, not real readings from your balls.
-    // Replace with measured values (use the "Sensor hue" readout on the Driver Hub).
+    // Placeholder colors not real readings from your balls.
+    // Replace with measured values (use the Sensor hue readout on the Driver Hub).
     static final int POLLEN_YELLOW_HEX = 0xFFFF00;   // hue 60
     static final int NECTAR_RED_HEX    = 0xFF0000;   // hue 0
     static final int NECTAR_BLUE_HEX   = 0x0000FF;   // hue 240
@@ -98,25 +96,18 @@ public class MecanumAuto extends LinearOpMode {
 
     // ---- Intake sequence (servo and flywheel) ----
 
-    // Make negative if the compliant wheels push the ball away instead of pulling it in.
+    // Make negative if the compliant wheels push the ball away and dont pull them in
     static final double INTAKE_POWER = 1.0;
 
-    // Make negative if the flywheel spins the wrong way. More power = longer shot.
+    // Make negative if flywheel spins the wrong way
     static final double FLYWHEEL_POWER = 1.0;
-
-    // Spin-up time before feeding the ball. A ball that reaches a slow flywheel comes out weak.
     static final long FLYWHEEL_SPINUP_MS = 800;
-
-    // How far and how fast to nudge forward into the ball. Slow, so it doesn't knock it away.
     static final double INTAKE_PUSH_INCHES = 4.0;
     static final double INTAKE_PUSH_POWER = 0.25;
 
-    // How long to keep everything running after the nudge so the ball makes it out the back.
     static final long LAUNCH_TIME_MS = 1200;
 
-    // =================================================================================
-    // HARDWARE
-    // =================================================================================
+    // hardware
 
     private DcMotor frontLeft, frontRight, backLeft, backRight;
     private IMU imu;
@@ -139,7 +130,7 @@ public class MecanumAuto extends LinearOpMode {
 
         // Show live sensor readings during INIT so you can check detection before the match.
         while (opModeInInit()) {
-            telemetry.addLine("Ready. Press START.");
+            telemetry.addLine("Ready, Press START");
             showSensorTelemetry();
             telemetry.update();
         }
@@ -166,19 +157,17 @@ public class MecanumAuto extends LinearOpMode {
         stopSuperstructure();
     }
 
-    // =================================================================================
-    // SETUP
-    // =================================================================================
+    // motor setings
 
     private void initHardware() {
-        // Names must match the Driver Hub robot configuration exactly.
+        // Names must match the Driver Hub robot configuration exactly
         frontLeft  = hardwareMap.get(DcMotor.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft   = hardwareMap.get(DcMotor.class, "backLeft");
         backRight  = hardwareMap.get(DcMotor.class, "backRight");
 
-        // Goal: positive power on every motor drives the robot forward.
-        // If a wheel spins backward during drive(), flip that motor's direction.
+        // Goal is positive power on every motor drives the robot forward
+        // If a wheel spins backward during drive(), flip that motor's direction
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -190,19 +179,19 @@ public class MecanumAuto extends LinearOpMode {
             m.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        // Set these to match which way the REV logo and USB ports face on your robot.
-        // Wrong values here mean wrong turns.
+        // Set these to match which way the REV logo and USB ports face on your robot
+        // Wrong values mean wrong turns
         imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD)));
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP)));
         imu.resetYaw();
 
-        // Must be configured as "Continuous Rotation Servo", not "Servo", or INIT crashes here.
+        // Must be configured as "Continuous Rotation Servo" not "Servo" or INIT crashes here
         intake = hardwareMap.get(CRServo.class, "intake");
 
-        // The flywheel only needs raw power, so no encoder required.
-        // FLOAT lets it coast down instead of braking a heavy wheel at full speed.
+        // The flywheel only needs raw power so no encoder required
+        // FLOAT lets it coast down instead of braking a heavy wheel at full speed
         flywheel = hardwareMap.get(DcMotor.class, "flywheel");
         flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -216,9 +205,7 @@ public class MecanumAuto extends LinearOpMode {
         return new DcMotor[]{frontLeft, frontRight, backLeft, backRight};
     }
 
-    // =================================================================================
     // DRIVE MOVES
-    // =================================================================================
 
     /** Drive straight. Positive inches = forward. */
     public void drive(double inches, double power) {
