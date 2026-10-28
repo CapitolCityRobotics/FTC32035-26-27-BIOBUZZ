@@ -24,24 +24,21 @@ public class LaunchController {
 
     private LaunchState launchState;
     private DcMotorEx launcher = null;
-    private CRServo leftFeeder = null;
-    private CRServo rightFeeder = null;
+    private CRServo feeder = null;
 
     public void init(HardwareMap hwMap) {
         launchState = LaunchState.IDLE;
 
         launcher = hwMap.get(DcMotorEx.class, "launcher");
-        leftFeeder = hwMap.get(CRServo.class, "left_feeder");
-        rightFeeder = hwMap.get(CRServo.class, "right_feeder");
+        feeder = hwMap.get(CRServo.class, "feeder");
 
     }
-    private void set_servo_speed(double speed){
-        leftFeeder.setPower(speed);
-        rightFeeder.setPower(speed);
+    private void servo_speed(double speed){
+        feeder.setPower(speed);
     }
     public void stop_all(){
-        set_servo_speed(STOP_SPEED);
-        launcher.setVelocity(0);
+        servo_speed(STOP_SPEED);
+        launcher.setVelocity(STOP_SPEED);
         launchState = LaunchState.IDLE;
     }
     public String getLaunchState() {
@@ -66,26 +63,17 @@ public class LaunchController {
         return launcher.getVelocity();
     }
 
-    public double servoSpeed(int servo){
-        if (servo == 0){
-            return (leftFeeder.getPower()+rightFeeder.getPower())/2;
-        }
-        else if (servo == -1){
-            return leftFeeder.getPower();
-        }
-        else if (servo == 1) {
-            return rightFeeder.getPower();
-        }
-        else{
-            return Double.NaN;
-        }
-    }
-
     public double servoSpeed(){
-        return servoSpeed(0);
-    }
+            return feeder.getPower();
+        }
 
-    public void launch(boolean shotRequested){
+
+    public void launch(boolean shotRequested, double servo_speed){
+        if (servo_speed < -0.1 || 0.1 < servo_speed){
+            servo_speed(servo_speed);
+        } else if (launchState != LaunchState.LAUNCH && launchState != LaunchState.LAUNCHING){
+            servo_speed(0);
+        }
         switch (launchState){
             case IDLE:
                 if (shotRequested){
@@ -99,7 +87,9 @@ public class LaunchController {
                 }
                 break;
             case LAUNCH:
-                set_servo_speed(FULL_SPEED);
+                if (servo_speed<0.1 && -0.1<servo_speed) {
+                    servo_speed(FULL_SPEED);
+                }
                 feederTimer.reset();
                 launchState = LaunchState.LAUNCHING;
                 break;

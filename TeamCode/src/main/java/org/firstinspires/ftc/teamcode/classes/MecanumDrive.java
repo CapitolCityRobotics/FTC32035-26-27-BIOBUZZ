@@ -13,7 +13,7 @@ public class MecanumDrive {
     private DcMotor frontRightDrive = null;
     private DcMotor backRightDrive = null;
     private IMU imu;
-    double speedLimitMax = 0.8;
+    double speedLimitMax = 1;
 
     double speedLimit;
 
@@ -64,8 +64,8 @@ public class MecanumDrive {
     public void driveRobotRelative(double gamepadLX, double gamepadLY, double gamepadRX){
         double max;
 
-        double axial = gamepadLY;
-        double lateral = -gamepadLX;
+        double axial = -gamepadLY;
+        double lateral = gamepadLX;
         double yaw = gamepadRX;
 
         speedLimit  =  speedLimitMax;
