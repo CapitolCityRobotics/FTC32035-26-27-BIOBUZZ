@@ -7,10 +7,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class LaunchController {
     final double FEED_TIME_SECONDS = 0.20; //The feeder servos run this long when a shot is requested.
+    final double FEED_TIME_SECONDS_FULL = 2;
     final double STOP_SPEED = 0.0; //We send this power to the servos when we want them to stop.
     final double FULL_SPEED = 1.0;
-    final double LAUNCHER_TARGET_VELOCITY = 1125;
-    final double LAUNCHER_MIN_VELOCITY = 1075;
+    final double LAUNCHER_TARGET_VELOCITY = 1150;
+    final double LAUNCHER_MIN_VELOCITY = 1100;
 
     ElapsedTime feederTimer = new ElapsedTime();
 
@@ -68,7 +69,7 @@ public class LaunchController {
         }
 
 
-    public void launch(boolean shotRequested, double servo_speed){
+    public void launch(boolean shotRequested, double servo_speed, boolean all){
         if (servo_speed < -0.1 || 0.1 < servo_speed){
             servo_speed(servo_speed);
         } else if (launchState != LaunchState.LAUNCH && launchState != LaunchState.LAUNCHING){
@@ -94,12 +95,11 @@ public class LaunchController {
                 launchState = LaunchState.LAUNCHING;
                 break;
             case LAUNCHING:
-                if (feederTimer.seconds()>=FEED_TIME_SECONDS){
+                if (feederTimer.seconds()>=(all ? FEED_TIME_SECONDS_FULL:FEED_TIME_SECONDS)){
                     launchState = LaunchState.IDLE;
                     stop_all();
                 }
                 break;
         }
     }
-
 }

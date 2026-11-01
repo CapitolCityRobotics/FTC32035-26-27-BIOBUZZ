@@ -39,9 +39,7 @@ public class MecanumDrive {
         backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         imu = hwMap.get(IMU.class, "imu");
-        /*
-        TODO: This needs to be changed to match the orientation on the robot
-         */
+
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection =

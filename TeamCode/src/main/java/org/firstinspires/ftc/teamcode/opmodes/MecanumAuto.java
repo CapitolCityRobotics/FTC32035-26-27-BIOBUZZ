@@ -4,6 +4,7 @@ import android.graphics.Color;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -35,6 +36,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  *   motor spinning the flywheel at the back (the launcher)
  */
 @Autonomous(name = "Mecanum Auto", group = "Auto")
+@Disabled
 public class MecanumAuto extends LinearOpMode {
 
     // SETTINGS: Tune these for our robo

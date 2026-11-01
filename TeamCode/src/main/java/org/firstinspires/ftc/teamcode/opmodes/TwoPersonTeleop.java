@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
-
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import org.firstinspires.ftc.teamcode.classes.IntakeController;
 import org.firstinspires.ftc.teamcode.classes.LaunchController;
 import org.firstinspires.ftc.teamcode.classes.MecanumDrive;
@@ -61,7 +59,7 @@ public class TwoPersonTeleop extends LinearOpMode {
             intake.set_intake_speed(-gamepad2.left_stick_y);
 
 
-            launcher.launch(gamepad2.y, -gamepad2.right_stick_y);
+            launcher.launch(gamepad2.y, -gamepad2.right_stick_y, false);
 
             telemetry.addData("Flywheel Speed: ", launcher.launcherVel());
             telemetry.addData("Servo Speed: ", launcher.servoSpeed());
